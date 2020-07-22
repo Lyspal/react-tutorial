@@ -15,6 +15,7 @@ import './index.css';
 //     }
 //   }
 
+// Same as above in function component form.
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
