@@ -64,12 +64,16 @@ function Square(props) {
         history: [{
           squares: Array(9).fill(null),
         }],
+        stepNumber: 0,
         xIsNext: true,
       };
     }
 
     handleClick(i) {
-      const history = this.state.history;
+      // Ensure that if we "go back in time" and then make a new move from that
+      // point, we throw away all the "future" history that would now become
+      // incorrect.
+      const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice(); // .slice() to create a copy
       // of the array
@@ -84,13 +88,21 @@ function Square(props) {
         //mutate the original array
           squares: squares,
         }]),
+        stepNumber: history.length,
         xIsNext: !this.state.xIsNext,
+      });
+    }
+
+    jumpTo(step) {
+      this.setState({
+        stepNumber: step,
+        xIsNext: (step % 2) === 0,
       });
     }
 
     render() {
       const history = this.state.history;
-      const current = history[history.length - 1];
+      const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
 
       const moves = history.map((step, move) => {
@@ -98,7 +110,7 @@ function Square(props) {
           'Go to move #' + move :
           'Go to game start';
         return (
-          <li>
+          <li key={move}>
             <button onClick={() => this.jumpTo(move)}>{desc}</button>
           </li>
         );
